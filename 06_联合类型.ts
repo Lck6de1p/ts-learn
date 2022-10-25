@@ -93,4 +93,29 @@
   // 然后将这个myObj再赋值给labeledObj，此时根据类型的兼容性，两种类型对象，参照鸭式辨型法，
   // 因为都具有label属性，所以被认定为两个相同，故而可以用此法来绕开多余的类型检查。
 
+
+  // 接口可以定义多次，类型不能
+  // type A1 = {x: number};
+  // type A1 = {y: number}; // Error
+
+  interface B1 {x: number};
+  interface B1 {y: number};
+
+  // // 接口扩展接口extend
+  // interface PointX {
+  //   x :number;
+  // }
+
+  // interface Point extends PointX {
+  //   y: number;
+  // }
+
+  // // 类型扩展类型&
+  // type PointX = {
+  //   x: number
+  // }
+
+  // type Point = PointX & {
+  //   y: number
+  // }
 }
