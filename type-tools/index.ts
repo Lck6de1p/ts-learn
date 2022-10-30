@@ -71,5 +71,77 @@ type Clone<T> = {
   [K in keyof T]: T[K];
 }
 
+// typeof
 
+const str = 'lck';
+const obj = { name: "lck" };
+const nullVar = null;
+const undefinedVar = undefined;
+const func = (input: string) => {
+  return input.length > 10;
+}
+
+type Str = typeof str // 'lck';
+type Obj = typeof obj // {name: string;};
+type Null = typeof nullVar // null;
+type Undefined = typeof undefined; // undefined;
+type Func = typeof func // (input: string) => boolean; 
+
+// 不仅可以在类型标注里使用typeof，还能在工具类型中使用typeof
+
+const func2: typeof func = (name: string) => {
+  return name === 'lck';
+}
+
+type FuncReturnType = ReturnType<typeof func>; // boolean
+
+
+// 在逻辑代码中 typeof为js中的typeof ， 在类型代码中为类型查询的typeof， 所以不允许出现：
+
+const isInputValid = (input: string) => {
+  return input.length > 10;
+}
+
+// let isValid: typeof isInputValid('lck');
+
+// 类型守卫
+
+declare const strOrNumOrBool: string | number | boolean;
+
+if (typeof strOrNumOrBool === "string") {
+  // 一定是字符串！
+  strOrNumOrBool.charAt(1);
+} else if (typeof strOrNumOrBool === "number") {
+  // 一定是数字！
+  strOrNumOrBool.toFixed();
+} else if (typeof strOrNumOrBool === "boolean") {
+  // 一定是布尔值！
+  strOrNumOrBool === true;
+} else {
+  // 要是走到这里就说明有问题！
+  const _exhaustiveCheck: never = strOrNumOrBool;
+  throw new Error(`Unknown input type: ${_exhaustiveCheck}`);
+}
+
+
+// 若提取if表达式
+
+function isString(input: unknown): boolean {
+  return typeof input === "string";
+}
+
+function fooX(input: string | number) {
+  if (isString(input)) {
+    // 类型“string | number”上不存在属性“replace”。
+    // (input).replace("linbudu", "linbudu599") // error
+  }
+  if (typeof input === 'number') { }
+}
+
+
+// is 关键字
+
+// function isString(input: unknown): input is string {
+//   return typeof input === "string";
+// }
 export { }
