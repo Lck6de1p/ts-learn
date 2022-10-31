@@ -144,4 +144,70 @@ function fooX(input: string | number) {
 // function isString(input: unknown): input is string {
 //   return typeof input === "string";
 // }
+
+
+function swap<T, U>([start, end]: [T, U]): [U, T] {
+  return [end, start];
+}
+
+const swapped = swap(['lck', 100]);
+
+
+// loadsh的pick函数，接受一个对象，接受一个对象属性名称组成的数组，从这个对象中截取选择的属性部分
+// const object = {'a': 1, 'b': 2, 'c': 3};
+// _.pick(object, ['a','c']);
+
+// pick<T extends object, U extends keyof T>(object: T, ...props: Array<U>): Pick<T, U>;
+
+
+function handle<T>(payload: T): Promise<[T]> {
+  return new Promise<[T]>((res, rej) => {
+    res([payload])
+  })
+}
+
+// Class中的泛型
+
+class Queue<TElementType> {
+  private _list: TElementType[];
+  constructor(initial: TElementType[]) {
+    this._list = initial;
+  }
+
+  // 入队一个队列泛型子类型的元素
+  enqueue<TType extends TElementType>(ele: TType): TElementType[] {
+    this._list.push(ele);
+    return this._list;
+  }
+
+  // 入队一个任意类型元素（无需为队列泛型子类型）
+  enqueueWithUnknownType<TType>(ele: TType): (TElementType | TType)[] {
+    return [...this._list, ele];
+  }
+
+  // 出队
+  dequeue(): TElementType[] {
+    this._list.shift();
+    return this._list;
+  }
+}
+
+// 内置方法中的泛型
+
+function p() {
+  return new Promise<boolean>((resolve, reject) => {
+    resolve(true);
+  })
+}
+const arr: Array<number> = [1, 2, 3];
+// arr.push('lck'); // error
+// arr.includes('lck'); // error
+
+arr.reduce((prev, curr, idx, arr) => {
+  return prev
+}, 1);
+
+// arr.reduce((prev, curr, idx, arr) => { // error
+//   return [...prev, curr]
+// }, []) 
 export { }
