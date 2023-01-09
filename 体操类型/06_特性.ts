@@ -60,13 +60,50 @@ type RemoveIndexSignatureRes = RemoveIndexSignature<{
 }>;
 
 type ClassPublicProps<Obj extends Record<string, any>> = {
-  [Key in keyof Obj] : Obj
-}
+  [Key in keyof Obj]: Obj;
+};
 
 // as const 会将类型推倒变成字面量
 const a = {
   a: 1,
-  b: 2
-} as const
+  b: 2,
+} as const;
 
-type A = typeof a 
+type A = typeof a;
+// 'a=1&b=2&c=3'
+// type ParseQueryString<Str extends string> =
+
+type ParseParam<Param extends string> =
+  Param extends `${infer Key}=${infer Value}`
+    ? {
+        [K in Key]: Value;
+      }
+    : {};
+type ParseParamRes = ParseParam<"a=1">;
+type MergeParams<
+  OneParams extends Record<string, any>,
+  OtherParams extends Record<string, any>
+> = {
+  [Key in keyof OneParams | keyof OtherParams]: Key extends keyof OneParams
+    ? Key extends keyof OtherParams
+      ? MergeValues<OneParams[Key], OtherParams[Key]>
+      : OneParams[Key]
+    : Key extends keyof OtherParams
+    ? OtherParams[Key]
+    : never;
+};
+
+type MergeValues<One, Other> = One extends Other
+  ? One
+  : Other extends unknown[]
+  ? [One, ...Other]
+  : [One, Other];
+
+type MergeParamsRes = MergeParams<{ a: 1 }, { b: 1 }>;
+type MergeParamsRes2 = MergeParams<{ a: 1 }, { a: 1; c2: 2 }>;
+
+type ParseQueryString<Str extends string> =
+  Str extends `${infer Param}&${infer Rest}`
+    ? MergeParams<ParseParam<Param>, ParseQueryString<Rest>>
+    : ParseParam<Str>;
+type ParseQueryStringRes = ParseQueryString<"a=1&b=2&c=3">;
