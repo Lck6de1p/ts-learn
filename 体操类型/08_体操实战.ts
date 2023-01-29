@@ -77,8 +77,78 @@ type JoinType<
 > = Items extends [infer Cur, ...infer Rest]
   ? JoinType<Rest, Delimiter, `${Result}${Delimiter}${Cur & string}`>
   : RemoveFirstDelimiter<Result>;
-  
+
 type RemoveFirstDelimiter<Str extends string> =
   Str extends `${infer _}${infer Rest}` ? Rest : Str;
 
 const joinRes = join("-")("a", "b", "c");
+
+type DeepCamelize<Obj extends Record<string, any>> = Obj extends unknown[]
+  ? CamelizeArr<Obj>
+  : {
+      [Key in keyof Obj as Key extends `${infer First}_${infer Rest}`
+        ? `${First}${Capitalize<Rest>}`
+        : Key]: DeepCamelize<Obj[Key]>;
+    };
+
+type CamelizeArr<Arr> = Arr extends [infer First, ...infer Rest]
+  ? First extends Record<string, any>
+    ? [DeepCamelize<First>, ...CamelizeArr<Rest>]
+    : [...CamelizeArr<Rest>]
+  : [];
+
+type DeepCamelizeRes = DeepCamelize<{
+  aaa_bbb: string;
+  bbb_ccc: [
+    1,
+    {
+      ccc_ddd: string;
+    },
+    {
+      ddd_eee: string;
+      eee_fff: {
+        fff_ggg: string;
+      };
+    }
+  ];
+}>;
+
+type AllKeyPath<Obj extends Record<string, any>> = {
+  [Key in keyof Obj]: Key extends string
+    ? Obj[Key] extends Record<string, any>
+      ? Key | `${Key}.${AllKeyPath<Obj[Key]>}`
+      : Key
+    : never;
+}[keyof Obj];
+
+type AllKeyPathRes = AllKeyPath<{
+  a: {
+    b: {
+      b1: string;
+      b2: string;
+    };
+    c: {
+      c1: string;
+      c2: string;
+    };
+  };
+}>;
+
+type Defaultize<A, B> = Pick<A, Exclude<keyof A, keyof B>> &
+  Partial<Pick<A, Extract<keyof A, keyof B>>> &
+  Partial<Pick<B, Exclude<keyof B, keyof A>>>;
+
+type DefaultizeRes = Copy<Defaultize<{ aaa: 1; bbb: 2 }, { bbb: 2; ccc: 3 }>>;
+
+enum Code {
+  a = 1,
+  b = 2,
+  c = 'abc'
+}
+
+type CodeRes = `${Code}`
+
+type StrToNum<Str> = 
+Str extends `${infer Num extends number}` ? Num : Str
+
+type CodeRes2 = StrToNum<`${Code}`>
